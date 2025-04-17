@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix Clone</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Netflix Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #141414;
+            color: white;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .logo {
+            width: 100px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .search-box {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 8px 15px;
+            border-radius: 4px;
+            color: white;
+        }
+
+        .btn {
+            padding: 8px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background-color: #e50914;
+            color: white;
+            border: none;
+        }
+
+        .banner {
+            height: 60vh;
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://assets.nflxext.com/ffe/siteui/vlv3/5e16108c-fd30-46de-9bb8-0b4e1bbbc509/29d8d7d7-83cc-4b5f-aa9b-6fd4f68bfaa6/IN-en-20240205-popsignuptwoweeks-perspective_alpha_website_large.jpg');
+            background-size: cover;
+            position: relative;
+        }
+
+        .banner-content {
+            position: absolute;
+            bottom: 20%;
+            left: 50px;
+            max-width: 500px;
+        }
+
+        .banner-title {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .banner-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .movie-row {
+            padding: 20px 50px;
+            margin-top: -100px;
+        }
+
+        .movie-row h2 {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .movie-container {
+            display: flex;
+            overflow-x: auto;
+            gap: 10px;
+            padding: 10px 0;
+        }
+
+        .movie-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .movie-card {
+            min-width: 200px;
+            height: 300px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 5px;
+            transition: transform 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .movie-card:hover {
+            transform: scale(1.05);
+        }
+
+        .movie-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .movie-card:hover .movie-info {
+            opacity: 1;
+        }
+
+        .ai-recommendation {
+            background-color: rgba(0,0,0,0.7);
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 50px;
+            max-width: 600px;
+        }
+
+        .mood-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .mood-btn {
+            padding: 10px 20px;
+            border: 2px solid #e50914;
+            border-radius: 20px;
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .mood-btn:hover, .mood-btn.active {
+            background-color: #e50914;
+        }
+
+        .recommendation-result {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 20px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .banner-content {
+                left: 20px;
+                right: 20px;
+            }
+
+            .banner-title {
+                font-size: 2rem;
+            }
+
+            .movie-row {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" alt="Netflix Logo" class="logo">
+            <div class="nav-links">
+                <a href="#">Home</a>
+                <a href="#">TV Shows</a>
+                <a href="#">Movies</a>
+                <a href="#">New & Popular</a>
+                <a href="#">My List</a>
+            </div>
+        </div>
+        <div class="nav-right">
+            <input type="text" class="search-box" placeholder="Search...">
+            <button class="btn btn-primary">Sign In</button>
+        </div>
+    </nav>
+
+    <section class="banner">
+        <div class="banner-content">
+            <h1 class="banner-title">Stranger Things</h1>
+            <p>When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces and one strange little girl.</p>
+            <div class="banner-buttons">
+                <button class="btn btn-primary"><i class="fas fa-play"></i> Play</button>
+                <button class="btn" style="background: rgba(255,255,255,0.2);"><i class="fas fa-info-circle"></i> More Info</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="movie-row">
+        <h2>Trending Now</h2>
+        <div class="movie-container">
+            <div class="movie-card" style="background-color: #1a1a1a; background-image: url('https://m.media-amazon.com/images/M/MV5BMDdmZGU3NDQtY2E5My00ZTliLWIzOTUtMTY4ZGI1YjdiNjk3XkEyXkFqcGdeQXVyNTA4NzY1MzY@._V1_.jpg');">
+                <div class="movie-info">
+                    <h3>Titanic</h3>
+                    <p>A seventeen-year-old aristocrat falls in love with a kind but poor artist aboard the luxurious, ill-fated R.M.S. Titanic.</p>
+                </div>
+            </div>
+            <div class="movie-card" style="background-color: #1a1a1a; background-image: url('https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_.jpg');">
+                <div class="movie-info">
+                    <h3>The Dark Knight</h3>
+                    <p>When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests of his ability to fight injustice.</p>
+                </div>
+            </div>
+            <div class="movie-card" style="background-color: #1a1a1a; background-image: url('https://m.media-amazon.com/images/M/MV5BNDE3ODcxYzMtY2YzZC00NmNlLWJiNDMtZDViZWM2MzIxZDYwXkEyXkFqcGdeQXVyNjAwNDUxODI@._V1_.jpg');">
+                <div class="movie-info">
+                    <h3>The Shawshank Redemption</h3>
+                    <p>Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.</p>
+                </div>
+            </div>
+        
+            </div>
+        </div>
+    </section>
+
+    
+
+    <div class="ai-recommendation">
+        <h2>AI Movie Recommender</h2>
+        <p>Tell us your mood and we'll find the perfect movie for you!</p>
+        
+        <div class="mood-selector">
+            <button class="mood-btn" data-mood="happy">😊 Happy</button>
+            <button class="mood-btn" data-mood="sad">😢 Sad</button>
+            <button class="mood-btn" data-mood="excited">🤩 Excited</button>
+            <button class="mood-btn" data-mood="relaxed">😌 Relaxed</button>
+            <button class="mood-btn" data-mood="adventurous">🏃‍♂️ Adventurous</button>
+        </div>
+
+        <div class="recommendation-result" id="recommendationResult">
+            <h3>Based on your mood, we recommend:</h3>
+            <div id="recommendedMovie"></div>
+        </div>
+    </div>
+
+    <script>
+        const moodButtons = document.querySelectorAll('.mood-btn');
+        const recommendationResult = document.getElementById('recommendationResult');
+        const recommendedMovie = document.getElementById('recommendedMovie');
+
+        const recommendations = {
+            happy: [
+                { title: "The Grand Budapest Hotel", description: "A whimsical comedy about a legendary concierge and his lobby boy." },
+                { title: "La La Land", description: "A musical romance about an aspiring actress and a jazz musician." }
+            ],
+            sad: [
+                { title: "The Pursuit of Happyness", description: "An inspiring story about overcoming adversity." },
+                { title: "Up", description: "A heartwarming animated adventure about love and loss." }
+            ],
+            excited: [
+                { title: "Mad Max: Fury Road", description: "A high-octane action film with stunning visuals." },
+                { title: "Inception", description: "A mind-bending sci-fi thriller about dreams within dreams." }
+            ],
+            relaxed: [
+                { title: "The Secret Life of Walter Mitty", description: "A beautiful journey of self-discovery." },
+                { title: "Chef", description: "A feel-good movie about food, family, and following your passion." }
+            ],
+            adventurous: [
+                { title: "Indiana Jones: Raiders of the Lost Ark", description: "A classic adventure film with non-stop action." },
+                { title: "The Lord of the Rings", description: "An epic fantasy adventure about a quest to destroy a powerful ring." }
+            ]
+        };
+
+        moodButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                moodButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+
+                const mood = button.dataset.mood;
+                const moodRecommendations = recommendations[mood];
+                const randomRecommendation = moodRecommendations[Math.floor(Math.random() * moodRecommendations.length)];
+
+                recommendedMovie.innerHTML = `
+                    <h4>${randomRecommendation.title}</h4>
+                    <p>${randomRecommendation.description}</p>
+                `;
+
+                recommendationResult.style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html> 
